@@ -72,6 +72,8 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+  this.bindButtonPress(".back-pre-state-button", this.backPreState);
+  this.bindButtonPress(".nb-mode-button", this.nbMode);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -130,6 +132,16 @@ KeyboardInputManager.prototype.listen = function () {
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
+};
+
+KeyboardInputManager.prototype.backPreState = function (event) {
+  event.preventDefault();
+  this.emit("backPreState");
+};
+
+KeyboardInputManager.prototype.nbMode = function (event) {
+  event.preventDefault();
+  this.emit("nbMode");
 };
 
 KeyboardInputManager.prototype.keepPlaying = function (event) {

@@ -5,10 +5,13 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
 
   this.startTiles     = 2;
+  this.moveCount      = 0;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
+  this.inputManager.on("backPreState", this.backPreState.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("nbMode", this.nbMode.bind(this));
 
   this.setup();
 }
@@ -60,6 +63,8 @@ GameManager.prototype.setup = function () {
 
   // Update the actuator
   this.actuate();
+
+  this.isNB = false;
 };
 
 // Set up the initial tiles to start the game with
@@ -72,7 +77,10 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 4096 : 4096;
+    var value = Math.random() < 0.9 ? 2 : 4;
+    if(this.isNB){
+      value = Math.random() < 0.9 ? 512 : 1024;
+    }
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
@@ -133,6 +141,9 @@ GameManager.prototype.moveTile = function (tile, cell) {
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
+  // 保存状态
+  this.savePreState();
+
   var self = this;
 
   if (this.isGameTerminated()) return; // Don't do anything if the game's over
@@ -273,4 +284,33 @@ GameManager.prototype.tileMatchesAvailable = function () {
 
 GameManager.prototype.positionsEqual = function (first, second) {
   return first.x === second.x && first.y === second.y;
+};
+
+
+// 记录上一步
+GameManager.prototype.savePreState = function () {
+
+  this.storageManager.setPreBestScore(this.score);
+  this.storageManager.setPreGameState(this.serialize());
+
+};
+
+// 返回上一步
+GameManager.prototype.backPreState = function () {
+
+  var previousState = this.storageManager.getPreGameState();
+
+    this.grid        = new Grid(previousState.grid.size,
+                                previousState.grid.cells); // Reload grid
+    this.score       = previousState.score;
+    this.over        = previousState.over;
+    this.won         = previousState.won;
+    this.keepPlaying = previousState.keepPlaying;
+    this.actuate();
+};
+
+// NB模式
+GameManager.prototype.nbMode = function () {
+  this.isNB = !this.isNB;
+  document.querySelector(".nb-mode-button").innerHTML = this.isNB ? "NB模式(开)" : "NB模式(关)";
 };

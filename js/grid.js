@@ -20,7 +20,6 @@ Grid.prototype.empty = function () {
 
 Grid.prototype.fromState = function (state) {
   var cells = [];
-
   for (var x = 0; x < this.size; x++) {
     var row = cells[x] = [];
 
@@ -29,7 +28,6 @@ Grid.prototype.fromState = function (state) {
       row.push(tile ? new Tile(tile.position, tile.value) : null);
     }
   }
-
   return cells;
 };
 
