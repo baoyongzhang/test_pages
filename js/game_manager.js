@@ -7,6 +7,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.startTiles     = 2;
   this.moveCount      = 0;
 
+  this.isNB = false;
+
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("backPreState", this.backPreState.bind(this));
@@ -63,8 +65,6 @@ GameManager.prototype.setup = function () {
 
   // Update the actuator
   this.actuate();
-
-  this.isNB = false;
 };
 
 // Set up the initial tiles to start the game with
